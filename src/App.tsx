@@ -1,15 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import MousePointer from "./Components/MousePointer";
-import ValorSlider from "./Components/ValorSlider";
+import MousePointer from "./components/MousePointer";
+import ValorSlider from "./components/ValorSlider";
+import BrandAccentLines from "./components/BrandAccentLines";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const IG_URL = "https://www.instagram.com/cervezarepublicard/";
 
+const HISTORIA_COPIA =
+  'Cerveza República, conocida como "La Tuya", es una marca dominicana lanzada en 2022 por el productor y comunicador Santiago Matías (Alofoke), marcando su incursión fuera de los medios. Comercializada por Vinícola del Norte, busca competir en el mercado local, destacando por su rápida popularidad y planes de establecer su propia cervecería.';
+
 function App() {
+  const [historiaExpandida, setHistoriaExpandida] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const mapa = useRef<HTMLDivElement>(null);
@@ -25,7 +30,137 @@ function App() {
     const glow = parallaxGlowRef.current;
     if (!root || !hero) return;
 
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    let pulseDelay: gsap.core.Tween | undefined;
+
     const ctx = gsap.context(() => {
+      if (prefersReducedMotion) {
+        gsap.set(".brand-line-anim", { scaleX: 1, opacity: 1 });
+      } else {
+        const mountLines =
+          gsap.utils.toArray<HTMLElement>(".brand-line--mount");
+        mountLines.forEach((el, i) => {
+          gsap.fromTo(
+            el,
+            { scaleX: 0, opacity: 0.35 },
+            {
+              scaleX: 1,
+              opacity: 0.92,
+              duration: 1.12,
+              ease: "power3.out",
+              delay: 0.72 + i * 0.08,
+            },
+          );
+        });
+
+        const prodLines = gsap.utils.toArray<HTMLElement>(
+          ".brand-line--scroll-product",
+        );
+        if (prodLines.length) {
+          gsap.fromTo(
+            prodLines,
+            { scaleX: 0, opacity: 0.35 },
+            {
+              scaleX: 1,
+              opacity: 0.94,
+              ease: "none",
+              stagger: 0.07,
+              scrollTrigger: {
+                trigger: ".beer-section",
+                start: "top center",
+                end: "bottom 90%",
+                scrub: 1,
+              },
+            },
+          );
+        }
+
+        const valorLines = gsap.utils.toArray<HTMLElement>(
+          ".brand-line--scroll-valor",
+        );
+        if (valorLines.length) {
+          gsap.fromTo(
+            valorLines,
+            { scaleX: 0, opacity: 0.35 },
+            {
+              scaleX: 1,
+              opacity: 0.92,
+              ease: "none",
+              stagger: 0.08,
+              scrollTrigger: {
+                trigger: ".valor-brand-wrap",
+                start: "top 90%",
+                end: "top 32%",
+                scrub: 0.55,
+              },
+            },
+          );
+        }
+
+        const galLines = gsap.utils.toArray<HTMLElement>(
+          ".brand-line--scroll-gallery",
+        );
+        if (galLines.length) {
+          gsap.fromTo(
+            galLines,
+            { scaleX: 0, opacity: 0.45 },
+            {
+              scaleX: 1,
+              opacity: 0.92,
+              duration: 0.92,
+              stagger: 0.1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: ".gallery-brand-wrap",
+                start: "top 80%",
+                once: true,
+                scrub: 0.1,
+              },
+            },
+          );
+        }
+
+        const aboutLines = gsap.utils.toArray<HTMLElement>(
+          ".brand-line--scroll-about",
+        );
+        if (aboutLines.length) {
+          gsap.fromTo(
+            aboutLines,
+            { scaleX: 0, opacity: 0.4 },
+            {
+              scaleX: 1,
+              opacity: 0.92,
+              duration: 0.88,
+              stagger: 0.09,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: ".historia-section",
+                start: "top 76%",
+                once: true,
+              },
+            },
+          );
+        }
+
+        pulseDelay = gsap.delayedCall(1.85, () => {
+          gsap.utils
+            .toArray<HTMLElement>(".brand-line-anim--pulse")
+            .forEach((el, i) => {
+              gsap.to(el, {
+                opacity: 0.38,
+                duration: 2.25 + (i % 4) * 0.28,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+                delay: i * 0.09,
+              });
+            });
+        });
+      }
+
       gsap.fromTo(
         ".hero-line",
         { y: 56, opacity: 0 },
@@ -102,6 +237,7 @@ function App() {
       });
 
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
+        if (el.closest(".gallery-brand-wrap")) return;
         gsap.from(el, {
           opacity: 0,
           y: 44,
@@ -114,9 +250,62 @@ function App() {
           },
         });
       });
+
+      const galleryWrap = root.querySelector(".gallery-brand-wrap");
+      const galleryMain = root.querySelector("[data-gallery-main]");
+      const galleryReveal = gsap.utils.toArray<HTMLElement>(
+        "[data-gallery-reveal]",
+      );
+
+      if (galleryWrap && galleryMain && galleryReveal.length >= 2) {
+        if (prefersReducedMotion) {
+          gsap.set(galleryMain, { opacity: 1, y: 0 });
+          gsap.set(galleryReveal, { clipPath: "inset(0% 0% 0% 0%)" });
+        } else {
+          gsap.set(galleryMain, { opacity: 0, y: 28 });
+          gsap.set(galleryReveal, {
+            clipPath: "inset(0% 0% 100% 0%)",
+          });
+
+          const galleryTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: galleryWrap,
+              start: "top center",
+              once: true,
+            },
+          });
+
+          galleryTl
+            .to(galleryMain, {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: "power2.out",
+            })
+            .to(
+              galleryReveal[0],
+              {
+                clipPath: "inset(0% 0% 0% 0%)",
+                duration: 0.82,
+                ease: "power2.inOut",
+              },
+              "+=0.2",
+            )
+            .to(
+              galleryReveal[1],
+              {
+                clipPath: "inset(0% 0% 0% 0%)",
+                duration: 0.82,
+                ease: "power2.inOut",
+              },
+              "+=0.14",
+            );
+        }
+      }
     }, root);
 
     return () => {
+      pulseDelay?.kill();
       ctx.revert();
     };
   }, []);
@@ -148,6 +337,8 @@ function App() {
               />
             </div>
 
+            <BrandAccentLines variant="hero" />
+
             {/* <div
             ref={mouseGlowRef}
             className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 will-change-transform"
@@ -160,9 +351,64 @@ function App() {
           </div> */}
 
             <div className="relative z-10 mx-auto max-w-4xl text-center">
-              <h3 className="hero-line font-body text-sm font-medium uppercase text-red-500 font-semibold tracking-[0.35em] md:text-3xl">
-                Cerveza
-              </h3>
+              <div className="hero-line hero-crest flex flex-col items-center">
+                <div
+                  className="hero-crest-bars mb-1 flex w-[min(17rem,90vw)] items-center justify-between px-0.5 md:mb-1.5"
+                  aria-hidden
+                >
+                  <span className="h-0.5 w-9 rounded-full bg-blue-900 md:h-0.5 md:w-12" />
+                  <span className="h-0.5 w-9 rounded-full bg-red-600 md:w-12" />
+                </div>
+                <div
+                  className="hero-crest-emblem mb-0.5 flex items-end justify-center gap-[0.12rem] md:mb-1 md:gap-1"
+                  aria-hidden
+                >
+                  <img
+                    src="/star-republica.png"
+                    alt=""
+                    className="h-2 w-2 -translate-y-px -rotate-6 object-contain opacity-95 md:h-4 md:w-4"
+                    width={16}
+                    height={16}
+                  />
+                  <img
+                    src="/star-republica.png"
+                    alt=""
+                    className="h-2.5 w-2.5 -translate-y-1 object-contain opacity-95 md:h-5 md:w-5 md:-translate-y-1.5"
+                    width={20}
+                    height={20}
+                  />
+                  <img
+                    src="/republica-centro.png"
+                    alt=""
+                    className="hero-crest-icon mx-px h-7 w-auto max-h-8 max-w-[2.1rem] shrink-0 -translate-y-1 object-contain object-center opacity-95 md:mx-0.5 md:h-10 md:max-h-11 md:max-w-[2.85rem] md:-translate-y-1.5"
+                    width={44}
+                    height={44}
+                    onError={(e) => {
+                      const el = e.currentTarget;
+                      if (!el.src.endsWith("/lofoFoke.png")) {
+                        el.src = "/lofoFoke.png";
+                      }
+                    }}
+                  />
+                  <img
+                    src="/star-republica.png"
+                    alt=""
+                    className="h-2.5 w-2.5 -translate-y-1 object-contain opacity-95 md:h-5 md:w-5 md:-translate-y-1.5"
+                    width={20}
+                    height={20}
+                  />
+                  <img
+                    src="/star-republica.png"
+                    alt=""
+                    className="h-2 w-2 translate-y-px rotate-6 object-contain opacity-95 md:h-4 md:w-4"
+                    width={16}
+                    height={16}
+                  />
+                </div>
+                <h3 className="font-body text-sm font-semibold uppercase tracking-[0.35em] text-red-500 md:text-3xl">
+                  Cerveza
+                </h3>
+              </div>
               <h1 className="hero-line mt-4 font-heading text-6xl text-blue-900 font-semibold uppercase leading-[0.95] md:text-7xl lg:text-8xl">
                 República
               </h1>
@@ -205,7 +451,7 @@ function App() {
           </section>
 
           <section
-            className="relative border-t border-white/5 bg-gray-200 py-24 md:py-32 relative"
+            className="valor-section relative border-t border-white/5 bg-gray-200 py-24 md:py-32"
             aria-label="Historia y valores de República"
           >
             <div className="absolute w-full top-0">
@@ -216,7 +462,10 @@ function App() {
               />
             </div>
 
-            <ValorSlider />
+            <div className="valor-brand-wrap relative mx-auto w-full max-w-4xl">
+              <BrandAccentLines variant="valor" />
+              <ValorSlider />
+            </div>
           </section>
 
           <section
@@ -236,10 +485,10 @@ function App() {
                   className="mt-6 font-body text-lg leading-relaxed text-brand-muted md:text-xl"
                   data-reveal
                 >
-                  Lager clara y equilibrada: malta suave, aroma fresco y un
-                  amargor discreto que deja paso a un final limpio. Pensada para
-                  el día a día, la mesa familiar o una tarde con los tuyos, sin
-                  complicarse la vida.
+                  Es una cerveza clara, suave y fácil de tomar: no te deja la
+                  boca amarga ni pesada. Sirve bien fría, para el día a día, en
+                  la mesa con la familia o con los amigos cuando quieres algo
+                  rico sin armar un show.
                 </p>
                 <ul
                   className="mt-8 space-y-3 font-body text-blue-900/85"
@@ -247,7 +496,7 @@ function App() {
                 >
                   <li className="flex items-center gap-3">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-gold" />
-                    Cuerpo ligero y fácil de beber
+                    Ligera y fácil de beber
                   </li>
                   <li className="flex items-center gap-3">
                     <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-accent" />
@@ -260,7 +509,7 @@ function App() {
                   </li>
                 </ul>
                 <div data-reveal className="inline-block btn-saber">
-                  <a href="#comunidad-republica" className="btn-saber-mas">
+                  <a href="#historia-republica" className="btn-saber-mas">
                     <span>Saber más</span>
                   </a>
                 </div>
@@ -272,7 +521,7 @@ function App() {
                   data-reveal
                 >
                   <div
-                    className="pointer-events-none absolute bottom-5 right-5 z-20 rounded-lg border border-blue-900/15 bg-white/90 px-3 py-2 shadow-md shadow-blue-900/10 backdrop-blur-sm md:bottom-7 md:right-7"
+                    className="pointer-events-none absolute bottom-5 right-5 z-30 rounded-lg border border-blue-900/15 bg-white/90 px-3 py-2 shadow-md shadow-blue-900/10 backdrop-blur-sm md:bottom-7 md:right-7"
                     aria-hidden
                   >
                     <p className="font-body text-[10px] font-medium uppercase tracking-[0.2em] text-brand-muted">
@@ -309,6 +558,82 @@ function App() {
                       alt="Lata Pequeña"
                     />
                   </div>
+
+                  <BrandAccentLines variant="product" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            id="historia-republica"
+            className="historia-section relative border-t border-gray-300/60 bg-slate-100 px-6 py-20 md:py-28"
+            aria-labelledby="historia-heading"
+          >
+            <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
+              <div className="order-2 md:order-1">
+                <h2
+                  id="historia-heading"
+                  className="font-heading text-3xl font-semibold uppercase tracking-wide text-blue-900 md:text-4xl"
+                  data-reveal
+                >
+                  Historia
+                </h2>
+                <p
+                  id="historia-texto"
+                  className={`mt-6 font-body text-lg leading-relaxed text-slate-700 md:text-xl ${historiaExpandida ? "" : "line-clamp-5"}`}
+                  data-reveal
+                >
+                  {HISTORIA_COPIA}
+                </p>
+                <div
+                  className="mt-6 flex flex-wrap items-center gap-4"
+                  data-reveal
+                >
+                  {!historiaExpandida ? (
+                    <button
+                      type="button"
+                      className="btn-saber-mas !mt-0"
+                      onClick={() => setHistoriaExpandida(true)}
+                      aria-expanded={false}
+                      aria-controls="historia-texto"
+                    >
+                      <span>Saber más</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="font-body text-sm font-semibold uppercase tracking-wider text-blue-900 underline decoration-blue-900/30 underline-offset-4 hover:text-blue-950"
+                      onClick={() => setHistoriaExpandida(false)}
+                      aria-expanded={true}
+                      aria-controls="historia-texto"
+                    >
+                      Ver menos
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="order-1 mx-auto w-full max-w-md md:order-2">
+                <div className="historia-showcase-frame">
+                  <div className="historia-showcase-inner relative aspect-[3/4] max-h-[min(88vh,520px)] w-full overflow-hidden">
+                    <img
+                      src="/santiago-matias.png"
+                      alt="Santiago Matías (Alofoke), fundador de Cerveza República"
+                      className="h-full w-full object-cover object-[center_12%]"
+                      width={720}
+                      height={960}
+                      decoding="async"
+                      fetchPriority="low"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        if (!img.src.endsWith("/foto7.jpeg")) {
+                          img.src = "/foto7.jpeg";
+                        }
+                      }}
+                    />
+                    <BrandAccentLines variant="about" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -316,57 +641,102 @@ function App() {
 
           <section
             id="comunidad-republica"
-            className="relative bg-gray-200 px-6 py-24 md:py-32 flex"
+            className="relative bg-gray-200 px-6 py-20 md:py-28"
             aria-labelledby="cta-heading"
           >
-            <div className="photo-container relative bg-white p-3">
-              <img src="/foto3.jpg" alt="imagen de fiesta" />
-              <div className="photo-container absolute bg-white p-3">
-                <img src="/foto1.jpeg" alt="imagen de fiesta" />
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-16">
+              {/* 🔹 GALERÍA */}
+              <div className="w-full md:w-1/2">
+                <div className="gallery-brand-wrap relative w-full max-w-md mx-auto">
+                  {/* imagen principal (la más grande) — entra primero en la timeline */}
+                  <div
+                    data-gallery-main
+                    className="relative bg-white p-2 shadow-lg will-change-transform"
+                  >
+                    <img
+                      src="/foto3.heic"
+                      className="w-full object-cover"
+                      alt=""
+                      decoding="async"
+                      fetchPriority="high"
+                    />
+                  </div>
+
+                  {/* imagen 1 — revelado arriba → abajo */}
+                  <div className="absolute top-0 right-0 z-20 w-[60%] translate-x-1/4 -translate-y-1/4 rotate-6 bg-white p-2 shadow-md sm:w-[50%] md:w-[40%]">
+                    <div
+                      data-gallery-reveal
+                      className="gallery-reveal-clip overflow-hidden"
+                    >
+                      <img
+                        src="/foto1.jpeg"
+                        className="block w-full object-cover"
+                        alt=""
+                        decoding="async"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+
+                  {/* imagen 2 — revelado arriba → abajo */}
+                  <div className="absolute bottom-0 left-0 z-0 w-[60%] -translate-x-1/4 translate-y-1/4 -rotate-6 bg-white p-2 shadow-md sm:w-[50%] md:w-[70%]">
+                    <div
+                      data-gallery-reveal
+                      className="gallery-reveal-clip overflow-hidden"
+                    >
+                      <img
+                        src="/foto2.jpg"
+                        className="block w-full object-cover"
+                        alt=""
+                        decoding="async"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+
+                  <BrandAccentLines variant="gallery" />
+                </div>
               </div>
-              <div className="photo-container absolute bg-white p-3">
-                <img src="/foto2.jpg" alt="imagen de fiesta" />
-              </div>
-            </div>
-            <div className="mx-auto max-w-2xl text-center">
-              <h2
-                id="cta-heading"
-                className="font-heading text-3xl font-semibold uppercase tracking-wide md:text-4xl"
-                data-reveal
-              >
-                Síguenos
-              </h2>
-              <p
-                className="mt-4 font-body text-lg text-brand-muted"
-                data-reveal
-              >
-                Novedades, eventos y la comunidad República La Tuya en
-                Instagram.
-              </p>
-              <div className="mt-10" data-reveal>
-                <a
-                  href={IG_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-brand-gold/40 bg-brand-gold/10 px-8 py-4 font-body font-medium text-brand-gold-bright transition hover:border-brand-gold hover:bg-brand-gold/20"
+
+              {/* 🔹 TEXTO */}
+              <div className="w-full md:w-1/2 text-center md:text-left">
+                <h2
+                  id="cta-heading"
+                  className="text-3xl md:text-4xl font-semibold uppercase tracking-wide text-red-700"
                 >
-                  @cervezarepublicard
-                </a>
+                  Síguenos
+                </h2>
+
+                <p className="mt-4 text-lg text-gray-600">
+                  Novedades, eventos y la comunidad República La Tuya en
+                  Instagram.
+                </p>
+
+                <div className="mt-8">
+                  <a
+                    href={IG_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 
+          rounded-full border border-red-500/40 bg-red-500/10 
+          px-8 py-4 font-medium text-red-700 
+          transition hover:border-red-600 hover:bg-red-500/20"
+                  >
+                    @cervezarepublicard
+                  </a>
+                </div>
+
+                <p className="mt-12 text-xs leading-relaxed text-gray-500">
+                  El consumo de bebidas alcohólicas es solo para mayores de
+                  edad. Bebe con responsabilidad.
+                </p>
               </div>
-              <p
-                className="mt-16 font-body text-xs leading-relaxed text-brand-muted/80"
-                data-reveal
-              >
-                El consumo de bebidas alcohólicas es solo para mayores de edad.
-                Bebe con responsabilidad.
-              </p>
             </div>
           </section>
         </main>
 
         <footer className="border-t border-white/5 px-6 py-8 text-center font-body text-xs text-brand-muted">
-          © {new Date().getFullYear()} Presentación República La Tuya. Marca
-          registrada de sus titulares.
+          © {new Date().getFullYear()} web consepto
         </footer>
       </div>
     </>

@@ -59,6 +59,31 @@
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9);
 }
 
+/* Historia / Sobre nosotros — marco foto (misma familia que producto) */
+.historia-showcase-frame {
+  border-radius: 1.75rem;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    rgb(30 58 138 / 0.24) 0%,
+    rgb(206 17 38 / 0.14) 50%,
+    rgb(30 58 138 / 0.2) 100%
+  );
+  box-shadow:
+    0 24px 50px -16px rgb(30 58 138 / 0.2),
+    0 0 0 1px rgb(30 58 138 / 0.08) inset;
+}
+
+.historia-showcase-inner {
+  border-radius: calc(1.75rem - 1px);
+  background: linear-gradient(
+    180deg,
+    rgb(15 23 42) 0%,
+    rgb(30 41 59) 100%
+  );
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn-saber-mas::after {
     transition: none;
@@ -195,6 +220,16 @@
   transition-duration: 0.12s;
 }
 
+/* Hero — cresta tipo lata (icono alineado con estrellas) */
+.hero-crest-icon {
+  display: block;
+}
+
+/* Galería comunidad — máscara para revelado vertical (GSAP clip-path) */
+.gallery-reveal-clip {
+  will-change: clip-path;
+}
+
 .landing-grain {
   pointer-events: none;
   position: absolute;
@@ -202,4 +237,257 @@
   z-index: 2;
   opacity: 0.07;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Líneas rojas / azules tipo empaque República (animación vía GSAP) ── */
+.brand-accent-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: visible;
+}
+
+.brand-line-anim {
+  position: absolute;
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  transform: scaleX(0);
+  opacity: 0.92;
+  will-change: transform, opacity;
+}
+
+.brand-line--blue {
+  background: linear-gradient(
+    90deg,
+    rgb(30 58 138 / 0.15),
+    rgb(30 64 175),
+    rgb(37 99 235 / 0.95)
+  );
+  box-shadow:
+    0 0 14px rgb(59 130 246 / 0.35),
+    0 0 1px rgb(30 58 138 / 0.5);
+}
+
+.brand-line--red {
+  background: linear-gradient(
+    90deg,
+    rgb(220 38 38 / 0.2),
+    var(--color-brand-accent, #ce1126),
+    rgb(185 28 28 / 0.9)
+  );
+  box-shadow:
+    0 0 12px rgb(239 68 68 / 0.35),
+    0 0 1px rgb(127 29 29 / 0.45);
+}
+
+/* Hero — enmarcan el bloque central */
+.brand-accent-lines--hero {
+  z-index: 8;
+}
+
+.brand-line-hero-tl {
+  top: min(22vh, 9.5rem);
+  left: clamp(0.75rem, 5vw, 2.5rem);
+  width: clamp(3rem, 12vw, 5.5rem);
+  transform-origin: left center;
+}
+
+.brand-line-hero-tr {
+  top: min(22vh, 9.5rem);
+  right: clamp(0.75rem, 5vw, 2.5rem);
+  width: clamp(2.5rem, 10vw, 4.25rem);
+  transform-origin: right center;
+}
+
+.brand-line-hero-bl {
+  top: min(48vh, 26rem);
+  left: clamp(0.5rem, 4vw, 2rem);
+  width: clamp(2.25rem, 9vw, 4rem);
+  transform-origin: left center;
+}
+
+.brand-line-hero-br {
+  top: min(48vh, 26rem);
+  right: clamp(0.5rem, 4vw, 2rem);
+  width: clamp(2rem, 8vw, 3.5rem);
+  transform-origin: right center;
+}
+
+.brand-line-hero-bottom-wrap {
+  position: absolute;
+  bottom: clamp(5.5rem, 16vh, 9rem);
+  left: 50%;
+  width: min(42vw, 17rem);
+  height: 3px;
+  transform: translateX(-50%);
+}
+
+.brand-line-hero-bottom-inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+}
+
+/* Slider valores — dos líneas arriba del bloque */
+.brand-accent-lines--valor {
+  inset: 0;
+  z-index: 10;
+}
+
+.brand-line-valor-left {
+  top: 0.35rem;
+  left: clamp(0.25rem, 4vw, 1.25rem);
+  width: min(32%, 10rem);
+  transform-origin: left center;
+}
+
+.brand-line-valor-right {
+  top: 0.35rem;
+  right: clamp(0.25rem, 4vw, 1.25rem);
+  width: min(28%, 8.5rem);
+  transform-origin: right center;
+}
+
+/* Producto — dentro del marco de fotos */
+.brand-accent-lines--product {
+  inset: 0.65rem;
+  z-index: 22;
+}
+
+.brand-line-prod-tl {
+  top: 8%;
+  left: 6%;
+  width: 22%;
+  max-width: 7.5rem;
+  transform-origin: left center;
+}
+
+.brand-line-prod-tr {
+  top: 8%;
+  right: 6%;
+  width: 16%;
+  max-width: 5.5rem;
+  transform-origin: right center;
+}
+
+.brand-line-prod-mid {
+  top: 46%;
+  left: 8%;
+  width: 32%;
+  max-width: 11rem;
+  transform-origin: left center;
+}
+
+.brand-line-prod-bottom-wrap {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  width: 68%;
+  max-width: 22rem;
+  height: 3px;
+  transform: translateX(-50%);
+}
+
+.brand-line-prod-bottom-inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+}
+
+/* Historia — líneas sobre retrato */
+.brand-accent-lines--about {
+  inset: 0.65rem;
+  z-index: 12;
+}
+
+.brand-line-about-tl {
+  top: 10%;
+  left: 7%;
+  width: 24%;
+  max-width: 6.5rem;
+  transform-origin: left center;
+}
+
+.brand-line-about-tr {
+  top: 10%;
+  right: 7%;
+  width: 18%;
+  max-width: 5rem;
+  transform-origin: right center;
+}
+
+.brand-line-about-mid {
+  top: 52%;
+  right: 10%;
+  width: 28%;
+  max-width: 8rem;
+  transform-origin: right center;
+}
+
+.brand-line-about-bottom-wrap {
+  position: absolute;
+  bottom: 9%;
+  left: 50%;
+  width: 72%;
+  max-width: 14rem;
+  height: 3px;
+  transform: translateX(-50%);
+}
+
+.brand-line-about-bottom-inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+}
+
+/* Galería — esquinas del bloque principal */
+.brand-accent-lines--gallery {
+  inset: -0.35rem;
+  z-index: 35;
+}
+
+.brand-line-gal-tl {
+  top: 0.4rem;
+  left: 0.35rem;
+  width: 28%;
+  max-width: 6.5rem;
+  transform-origin: left center;
+}
+
+.brand-line-gal-tr {
+  top: 0.4rem;
+  right: 0.35rem;
+  width: 22%;
+  max-width: 5rem;
+  transform-origin: right center;
+}
+
+.brand-line-gal-br {
+  bottom: 0.4rem;
+  right: 0.35rem;
+  width: 36%;
+  max-width: 8rem;
+  transform-origin: right center;
+}
+
+.brand-line-gal-bl {
+  bottom: 0.4rem;
+  left: 0.35rem;
+  width: 30%;
+  max-width: 7rem;
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-line-anim {
+    transform: scaleX(1) !important;
+    animation: none;
+  }
 }
