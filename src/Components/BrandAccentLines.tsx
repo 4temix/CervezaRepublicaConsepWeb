@@ -7,7 +7,7 @@ type Props = {
 
 /**
  * Líneas horizontales rojas y azules inspiradas en el empaque de República La Tuya.
- * Las animaciones GSAP se aplican desde App.tsx vía clases `.brand-line-anim`.
+ * Las animaciones GSAP se aplican desde HomePage vía clases `.brand-line-anim`.
  */
 export default function BrandAccentLines({ variant, className = "" }: Props) {
   if (variant === "hero") {
