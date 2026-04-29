@@ -8,6 +8,9 @@ import BrandAccentLines from "./components/BrandAccentLines";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** Refresco cuando cambia la altura útil (barra URL móvil, teclado, etc.) */
+const SCROLL_TRIGGER_REFRESH_MS = 200;
+
 const IG_URL = "https://www.instagram.com/cervezarepublicard/";
 
 const HISTORIA_COPIA =
@@ -23,6 +26,36 @@ function App() {
   const parallaxGlowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!ScrollTrigger.isTouch) return;
+    ScrollTrigger.normalizeScroll({
+      allowNestedScroll: true,
+    });
+    return () => {
+      ScrollTrigger.normalizeScroll(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const scheduleRefresh = () => {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        timeoutId = undefined;
+        ScrollTrigger.refresh();
+      }, SCROLL_TRIGGER_REFRESH_MS);
+    };
+
+    window.addEventListener("resize", scheduleRefresh);
+    window.visualViewport?.addEventListener("resize", scheduleRefresh);
+
+    return () => {
+      window.removeEventListener("resize", scheduleRefresh);
+      window.visualViewport?.removeEventListener("resize", scheduleRefresh);
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
     const root = rootRef.current;
     const hero = heroRef.current;
     const back = parallaxBackRef.current;
@@ -36,7 +69,8 @@ function App() {
 
     let pulseDelay: gsap.core.Tween | undefined;
 
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context;
+    ctx = gsap.context(() => {
       if (prefersReducedMotion) {
         gsap.set(".brand-line-anim", { scaleX: 1, opacity: 1 });
       } else {
@@ -223,18 +257,50 @@ function App() {
         },
       });
 
-      gsap.utils.toArray<HTMLElement>(".cerveza").forEach((el, index) => {
-        gsap.to(el, {
-          y: 25 * index + 2,
+      const beerSection = root.querySelector<HTMLElement>(".beer-section");
+      const beerEls = gsap.utils.toArray<HTMLElement>(".cerveza");
+      const attachBeerScroll = () => {
+        beerEls.forEach((el, index) => {
+          gsap.to(el, {
+            y: 25 * index + 2,
+            scrollTrigger: {
+              trigger: beerSection ?? ".beer-section",
+              start: "top top",
+              end: "center top",
+              scrub: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        });
+      };
+
+      if (prefersReducedMotion) {
+        gsap.set(beerEls, { opacity: 1, clearProps: "transform" });
+        attachBeerScroll();
+      } else if (beerEls.length && beerSection) {
+        gsap.set(beerEls, { opacity: 0, y: 40 });
+        const beerIntroTl = gsap.timeline({
+          defaults: { ease: "power2.out" },
           scrollTrigger: {
-            trigger: ".beer-section",
-            start: "top top",
-            end: "center top",
-            scrub: 1,
-            invalidateOnRefresh: true,
+            trigger: beerSection,
+            start: "top center",
+            once: true,
+          },
+          onComplete: () => {
+            ctx.add(attachBeerScroll);
           },
         });
-      });
+        beerEls.forEach((el, i) => {
+          beerIntroTl.to(
+            el,
+            { opacity: 1, y: 0, duration: 0.58 },
+            i === 0 ? 0 : ">-0.36",
+          );
+        });
+      } else if (beerEls.length) {
+        gsap.set(beerEls, { opacity: 1 });
+        attachBeerScroll();
+      }
 
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
         if (el.closest(".gallery-brand-wrap")) return;
@@ -253,6 +319,9 @@ function App() {
 
       const galleryWrap = root.querySelector(".gallery-brand-wrap");
       const galleryMain = root.querySelector("[data-gallery-main]");
+      const galleryMainScroll = galleryWrap?.querySelector<HTMLElement>(
+        "[data-gallery-main-scroll]",
+      );
       const galleryReveal = gsap.utils.toArray<HTMLElement>(
         "[data-gallery-reveal]",
       );
@@ -260,6 +329,9 @@ function App() {
       if (galleryWrap && galleryMain && galleryReveal.length >= 2) {
         if (prefersReducedMotion) {
           gsap.set(galleryMain, { opacity: 1, y: 0 });
+          if (galleryMainScroll) {
+            gsap.set(galleryMainScroll, { clearProps: "transform" });
+          }
           gsap.set(galleryReveal, { clipPath: "inset(0% 0% 0% 0%)" });
         } else {
           gsap.set(galleryMain, { opacity: 0, y: 28 });
@@ -300,6 +372,38 @@ function App() {
               },
               "+=0.14",
             );
+
+          if (galleryMainScroll) {
+            gsap.fromTo(
+              galleryMainScroll,
+              { y: 20 },
+              {
+                y: -20,
+                ease: "none",
+                force3D: true,
+                scrollTrigger: {
+                  trigger: galleryWrap,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 0.55,
+                },
+              },
+            );
+          }
+
+          galleryWrap
+            .querySelectorAll<HTMLElement>("[data-gallery-float]")
+            .forEach((floatEl, i) => {
+              gsap.to(floatEl, {
+                y: i === 0 ? -8 : 8,
+                duration: 2.25,
+                ease: "sine.inOut",
+                repeat: -1,
+                yoyo: true,
+                delay: i * 0.5,
+                force3D: true,
+              });
+            });
         }
       }
     }, root);
@@ -648,49 +752,64 @@ function App() {
               {/* 🔹 GALERÍA */}
               <div className="w-full md:w-1/2">
                 <div className="gallery-brand-wrap relative w-full max-w-md mx-auto">
-                  {/* imagen principal (la más grande) — entra primero en la timeline */}
+                  {/* imagen principal — scroll mueve el marco; timeline anima el interior */}
                   <div
-                    data-gallery-main
-                    className="relative bg-white p-2 shadow-lg will-change-transform"
+                    data-gallery-main-scroll
+                    className="relative will-change-transform"
                   >
-                    <img
-                      src="/foto3.heic"
-                      className="w-full object-cover"
-                      alt=""
-                      decoding="async"
-                      fetchPriority="high"
-                    />
-                  </div>
-
-                  {/* imagen 1 — revelado arriba → abajo */}
-                  <div className="absolute top-0 right-0 z-20 w-[60%] translate-x-1/4 -translate-y-1/4 rotate-6 bg-white p-2 shadow-md sm:w-[50%] md:w-[40%]">
                     <div
-                      data-gallery-reveal
-                      className="gallery-reveal-clip overflow-hidden"
+                      data-gallery-main
+                      className="relative bg-white p-2 shadow-lg will-change-transform"
                     >
                       <img
-                        src="/foto1.jpeg"
+                        src="/foto3.heic"
                         className="block w-full object-cover"
                         alt=""
                         decoding="async"
-                        loading="lazy"
+                        fetchPriority="high"
                       />
                     </div>
                   </div>
 
-                  {/* imagen 2 — revelado arriba → abajo */}
-                  <div className="absolute bottom-0 left-0 z-0 w-[60%] -translate-x-1/4 translate-y-1/4 -rotate-6 bg-white p-2 shadow-md sm:w-[50%] md:w-[70%]">
+                  {/* imagen 1 — ancla + rotación fuera; marco blanco flota con transform (GPU) */}
+                  <div className="absolute top-0 right-0 z-20 w-[60%] translate-x-1/4 -translate-y-1/4 rotate-6 sm:w-[50%] md:w-[40%]">
                     <div
-                      data-gallery-reveal
-                      className="gallery-reveal-clip overflow-hidden"
+                      data-gallery-float
+                      className="bg-white p-2 shadow-md will-change-transform"
                     >
-                      <img
-                        src="/foto2.jpg"
-                        className="block w-full object-cover"
-                        alt=""
-                        decoding="async"
-                        loading="lazy"
-                      />
+                      <div
+                        data-gallery-reveal
+                        className="gallery-reveal-clip overflow-hidden"
+                      >
+                        <img
+                          src="/foto1.jpeg"
+                          className="block w-full object-cover"
+                          alt=""
+                          decoding="async"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* imagen 2 */}
+                  <div className="absolute bottom-0 left-0 z-0 w-[60%] -translate-x-1/4 translate-y-1/4 -rotate-6 sm:w-[50%] md:w-[70%]">
+                    <div
+                      data-gallery-float
+                      className="bg-white p-2 shadow-md will-change-transform"
+                    >
+                      <div
+                        data-gallery-reveal
+                        className="gallery-reveal-clip overflow-hidden"
+                      >
+                        <img
+                          src="/foto2.jpg"
+                          className="block w-full object-cover"
+                          alt=""
+                          decoding="async"
+                          loading="lazy"
+                        />
+                      </div>
                     </div>
                   </div>
 
