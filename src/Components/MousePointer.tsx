@@ -89,7 +89,7 @@ export default function MousePointer() {
         position: "fixed",
         left: 0,
         top: 0,
-        width: "3%",
+        width: "2%",
         aspectRatio: "1 / 1",
         borderRadius: "50%",
         borderWidth: "2px",
