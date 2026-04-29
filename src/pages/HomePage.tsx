@@ -676,10 +676,7 @@ function HomePage() {
                   </li>
                 </ul>
                 <div data-reveal className="inline-block btn-saber">
-                  <Link
-                    to="/#historia-republica"
-                    className="btn-saber-mas"
-                  >
+                  <Link to="/saber-mas" className="btn-saber-mas">
                     <span>Saber más</span>
                   </Link>
                 </div>
@@ -757,7 +754,7 @@ function HomePage() {
                   {HISTORIA_COPIA}
                 </p>
                 <div data-reveal className="mt-6 inline-block btn-saber">
-                  <Link to="/#comunidad-republica" className="btn-saber-mas">
+                  <Link to="/saber-mas" className="btn-saber-mas">
                     <span>Saber más</span>
                   </Link>
                 </div>
