@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import RootLayout from "./layouts/RootLayout";
 import HomePage from "./pages/HomePage";
@@ -27,10 +23,6 @@ const router = createBrowserRouter(
         {
           index: true,
           element: <HomePage />,
-        },
-        {
-          path: "*",
-          element: <Navigate to="/404" replace />,
         },
       ],
     },
