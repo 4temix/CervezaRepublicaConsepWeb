@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import "../App.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { homeImages } from "../assets/homeImages";
 import BrandAccentLines from "../Components/BrandAccentLines";
 import ExperienciaRepublica from "../Components/ExperienciaRepublica";
 import ValorSlider from "../Components/ValorSlider";
@@ -703,7 +704,7 @@ function HomePage() {
           >
             <div className="absolute w-full h-full bottom-0" ref={mapa}>
               <img
-                src="/mapa.png"
+                src={homeImages.mapa}
                 className=" w-full h-full opacity-15 object-cover"
                 alt=""
               />
@@ -736,41 +737,41 @@ function HomePage() {
                   aria-hidden
                 >
                   <img
-                    src="/star-republica.png"
+                    src={homeImages.starRepublica}
                     alt=""
                     className="h-2 w-2 -translate-y-px -rotate-6 object-contain opacity-95 md:h-4 md:w-4"
                     width={16}
                     height={16}
                   />
                   <img
-                    src="/star-republica.png"
+                    src={homeImages.starRepublica}
                     alt=""
                     className="h-2.5 w-2.5 -translate-y-1 object-contain opacity-95 md:h-5 md:w-5 md:-translate-y-1.5"
                     width={20}
                     height={20}
                   />
                   <img
-                    src="/republica-centro.png"
+                    src={homeImages.republicaCentro}
                     alt=""
                     className="hero-crest-icon mx-px h-7 w-auto max-h-8 max-w-[2.1rem] shrink-0 -translate-y-1 object-contain object-center opacity-95 md:mx-0.5 md:h-10 md:max-h-11 md:max-w-[2.85rem] md:-translate-y-1.5"
                     width={44}
                     height={44}
                     onError={(e) => {
                       const el = e.currentTarget;
-                      if (!el.src.endsWith("/lofoFoke.png")) {
-                        el.src = "/lofoFoke.png";
+                      if (el.src !== homeImages.lofoFoke) {
+                        el.src = homeImages.lofoFoke;
                       }
                     }}
                   />
                   <img
-                    src="/star-republica.png"
+                    src={homeImages.starRepublica}
                     alt=""
                     className="h-2.5 w-2.5 -translate-y-1 object-contain opacity-95 md:h-5 md:w-5 md:-translate-y-1.5"
                     width={20}
                     height={20}
                   />
                   <img
-                    src="/star-republica.png"
+                    src={homeImages.starRepublica}
                     alt=""
                     className="h-2 w-2 translate-y-px rotate-6 object-contain opacity-95 md:h-4 md:w-4"
                     width={16}
@@ -828,7 +829,7 @@ function HomePage() {
           >
             <div className="absolute w-full top-0">
               <img
-                src="/borde.png"
+                src={homeImages.borde}
                 className="object-cover w-full opacity-15"
                 alt=""
               />
@@ -907,7 +908,7 @@ function HomePage() {
                   {/* Botella Izquierda - Usando % para que no se salga */}
                   <div className="cerveza absolute left-[12%] md:left-[15%] w-[30%] cursor-pointer">
                     <img
-                      src="/botella.png"
+                      src={homeImages.botella}
                       className="w-full h-auto"
                       alt="Botella"
                     />
@@ -916,7 +917,7 @@ function HomePage() {
                   {/* Lata Central - La más grande */}
                   <div className="cerveza absolute bottom-[6%] w-[80%]">
                     <img
-                      src="/lataGrande.webp"
+                      src={homeImages.lataGrande}
                       className="w-full h-auto"
                       alt="Lata Grande"
                     />
@@ -925,7 +926,7 @@ function HomePage() {
                   {/* Lata Pequeña Derecha */}
                   <div className="cerveza absolute right-[13%] md:right-[15%] bottom-[9%] w-[27%]">
                     <img
-                      src="/pequenia.png"
+                      src={homeImages.pequenia}
                       className="w-full h-auto"
                       alt="Lata Pequeña"
                     />
@@ -971,7 +972,7 @@ function HomePage() {
                 <div className="historia-showcase-frame">
                   <div className="historia-showcase-inner relative aspect-[3/4] max-h-[min(88vh,520px)] w-full overflow-hidden">
                     <img
-                      src="/santiago-matias.png"
+                      src={homeImages.santiagoMatias}
                       alt="Santiago Matías (Alofoke), fundador de Cerveza República"
                       className="historia-parallax-img h-full w-full object-cover object-[center_12%]"
                       width={720}
@@ -980,8 +981,8 @@ function HomePage() {
                       fetchPriority="low"
                       onError={(e) => {
                         const img = e.currentTarget;
-                        if (!img.src.endsWith("/foto7.jpeg")) {
-                          img.src = "/foto7.jpeg";
+                        if (img.src !== homeImages.foto7) {
+                          img.src = homeImages.foto7;
                         }
                       }}
                     />
@@ -1011,7 +1012,7 @@ function HomePage() {
                       className="relative bg-white p-2 shadow-lg will-change-transform"
                     >
                       <img
-                        src="/foto3.heic"
+                        src={homeImages.foto3}
                         className="block w-full object-cover"
                         alt=""
                         decoding="async"
@@ -1031,7 +1032,7 @@ function HomePage() {
                         className="gallery-reveal-clip overflow-hidden"
                       >
                         <img
-                          src="/foto1.jpeg"
+                          src={homeImages.foto1}
                           className="block w-full object-cover"
                           alt=""
                           decoding="async"
@@ -1052,7 +1053,7 @@ function HomePage() {
                         className="gallery-reveal-clip overflow-hidden"
                       >
                         <img
-                          src="/foto2.jpg"
+                          src={homeImages.foto2}
                           className="block w-full object-cover"
                           alt=""
                           decoding="async"
