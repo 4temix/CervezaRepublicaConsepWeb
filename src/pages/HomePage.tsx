@@ -3,8 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import "../App.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import ValorSlider from "../components/ValorSlider";
-import BrandAccentLines from "../components/BrandAccentLines";
+import BrandAccentLines from "../Components/BrandAccentLines";
+import ExperienciaRepublica from "../Components/ExperienciaRepublica";
+import ValorSlider from "../Components/ValorSlider";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,6 +22,7 @@ function HomePage() {
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const mapa = useRef<HTMLDivElement>(null);
+  const beerShowcaseInnerRef = useRef<HTMLDivElement>(null);
   const parallaxBackRef = useRef<HTMLDivElement>(null);
   const parallaxMidRef = useRef<HTMLDivElement>(null);
   const parallaxGlowRef = useRef<HTMLDivElement>(null);
@@ -356,8 +358,161 @@ function HomePage() {
         attachBeerScroll();
       }
 
+      const historiaImg = root.querySelector<HTMLElement>(
+        ".historia-parallax-img",
+      );
+      if (historiaImg && !prefersReducedMotion) {
+        gsap.set(historiaImg, {
+          scale: 1.08,
+          transformOrigin: "center center",
+          force3D: true,
+        });
+        gsap.to(historiaImg, {
+          yPercent: -6,
+          ease: "none",
+          force3D: true,
+          scrollTrigger: {
+            trigger: ".historia-section",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.7,
+          },
+        });
+      }
+
+      /** Misma tolerancia de activación que la intro del producto: start "top center", once */
+      const expScrollTriggerBase = {
+        start: "top center" as const,
+        once: true as const,
+        invalidateOnRefresh: true,
+      };
+
+      const sensorialSection = root.querySelector<HTMLElement>(
+        ".experiencia-sensorial-section",
+      );
+      const ritualSection = root.querySelector<HTMLElement>(
+        ".ritual-republica-section",
+      );
+
+      if (prefersReducedMotion) {
+        const expTargets = root.querySelectorAll<HTMLElement>(
+          ".exp-sensorial-intro > *, .sensorial-card, .exp-ritual-intro > *, .ritual-gsap-card, [data-exp-blob]",
+        );
+        if (expTargets.length) {
+          gsap.set(expTargets, { clearProps: "opacity,visibility,transform" });
+        }
+      } else if (sensorialSection) {
+        const introEls = gsap.utils.toArray<HTMLElement>(
+          sensorialSection.querySelectorAll(".exp-sensorial-intro > *"),
+        );
+        const cards = gsap.utils.toArray<HTMLElement>(
+          sensorialSection.querySelectorAll(".sensorial-card"),
+        );
+        const blobs = gsap.utils.toArray<HTMLElement>(
+          sensorialSection.querySelectorAll("[data-exp-blob]"),
+        );
+
+        if (introEls.length || cards.length) {
+          gsap.set([...introEls, ...cards], {
+            autoAlpha: 0,
+            y: 40,
+            force3D: true,
+          });
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: sensorialSection,
+                ...expScrollTriggerBase,
+              },
+            })
+            .to(introEls, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.62,
+              stagger: 0.1,
+              ease: "power2.out",
+            })
+            .to(
+              cards,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.68,
+                stagger: 0.12,
+                ease: "power3.out",
+              },
+              introEls.length ? "-=0.22" : 0,
+            );
+        }
+
+        if (blobs.length) {
+          blobs.forEach((blob, i) => {
+            gsap.fromTo(
+              blob,
+              { y: i === 0 ? 24 : -20 },
+              {
+                y: i === 0 ? -36 : 28,
+                ease: "none",
+                force3D: true,
+                scrollTrigger: {
+                  trigger: sensorialSection,
+                  start: "top center",
+                  end: "bottom 90%",
+                  scrub: 1,
+                  invalidateOnRefresh: true,
+                },
+              },
+            );
+          });
+        }
+      }
+
+      if (!prefersReducedMotion && ritualSection) {
+        const introR = gsap.utils.toArray<HTMLElement>(
+          ritualSection.querySelectorAll(".exp-ritual-intro > *"),
+        );
+        const ritualCards = gsap.utils.toArray<HTMLElement>(
+          ritualSection.querySelectorAll(".ritual-gsap-card"),
+        );
+
+        if (introR.length || ritualCards.length) {
+          gsap.set([...introR, ...ritualCards], {
+            autoAlpha: 0,
+            y: 40,
+            force3D: true,
+          });
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: ritualSection,
+                ...expScrollTriggerBase,
+              },
+            })
+            .to(introR, {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.58,
+              stagger: 0.09,
+              ease: "power2.out",
+            })
+            .to(
+              ritualCards,
+              {
+                autoAlpha: 1,
+                y: 0,
+                duration: 0.66,
+                stagger: 0.14,
+                ease: "power3.out",
+              },
+              introR.length ? "-=0.2" : 0,
+            );
+        }
+      }
+
       gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
         if (el.closest(".gallery-brand-wrap")) return;
+        if (el.closest(".experiencia-sensorial-section")) return;
+        if (el.closest(".ritual-republica-section")) return;
         gsap.from(el, {
           opacity: 0,
           y: 44,
@@ -462,9 +617,59 @@ function HomePage() {
       }
     }, root);
 
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+
     return () => {
       pulseDelay?.kill();
       ctx.revert();
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = beerShowcaseInnerRef.current;
+    if (!el) return;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const finePointer = window.matchMedia(
+      "(hover: hover) and (pointer: fine)",
+    ).matches;
+    if (reduced || !finePointer) return;
+
+    const maxDeg = 5.5;
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      const rotY = (x - 0.5) * 2 * maxDeg;
+      const rotX = (0.5 - y) * 2 * maxDeg * 0.62;
+      gsap.to(el, {
+        rotateX: rotX,
+        rotateY: rotY,
+        transformPerspective: 920,
+        duration: 0.32,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    };
+    const onLeave = () => {
+      gsap.to(el, {
+        rotateX: 0,
+        rotateY: 0,
+        duration: 0.62,
+        ease: "power3.out",
+        overwrite: "auto",
+      });
+    };
+    el.style.transformStyle = "preserve-3d";
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+      gsap.set(el, { clearProps: "transform,transformPerspective" });
     };
   }, []);
 
@@ -499,7 +704,7 @@ function HomePage() {
             <div className="absolute w-full h-full bottom-0" ref={mapa}>
               <img
                 src="/mapa.png"
-                className="md:object-fill w-full h-full opacity-15 object-cover"
+                className=" w-full h-full opacity-15 object-cover"
                 alt=""
               />
             </div>
@@ -682,10 +887,10 @@ function HomePage() {
                 </div>
               </div>
 
-              <div className="beer-showcase-frame mx-auto w-full max-w-[520px]">
+              <div className="beer-showcase-frame mx-auto w-full max-w-[520px]" data-reveal>
                 <div
+                  ref={beerShowcaseInnerRef}
                   className="beer-showcase-inner relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden p-8 md:p-12"
-                  data-reveal
                 >
                   <div
                     className="pointer-events-none absolute bottom-5 right-5 z-30 rounded-lg border border-blue-900/15 bg-white/90 px-3 py-2 shadow-md shadow-blue-900/10 backdrop-blur-sm md:bottom-7 md:right-7"
@@ -732,6 +937,8 @@ function HomePage() {
             </div>
           </section>
 
+          <ExperienciaRepublica />
+
           <section
             id="historia-republica"
             className="historia-section relative border-t border-gray-300/60 bg-slate-100 px-6 py-20 md:py-28"
@@ -766,7 +973,7 @@ function HomePage() {
                     <img
                       src="/santiago-matias.png"
                       alt="Santiago Matías (Alofoke), fundador de Cerveza República"
-                      className="h-full w-full object-cover object-[center_12%]"
+                      className="historia-parallax-img h-full w-full object-cover object-[center_12%]"
                       width={720}
                       height={960}
                       decoding="async"

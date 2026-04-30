@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import {
-  MdAutoStories,
-  MdGroups,
-  MdHome,
-  MdLocalBar,
-} from "react-icons/md";
+import { MdAutoStories, MdGroups, MdHome, MdLocalBar } from "react-icons/md";
 import gsap from "gsap";
-import MousePointer from "../components/MousePointer";
+import MousePointer from "../Components/MousePointer";
 
 /** IDs de sección en HomePage (hero = inicio) */
 const SECTION_IDS = [
@@ -35,11 +30,7 @@ const SECTION_LINKS = [
   },
 ] as const;
 
-const MOBILE_LINK_ICONS = [
-  MdLocalBar,
-  MdAutoStories,
-  MdGroups,
-] as const;
+const MOBILE_LINK_ICONS = [MdLocalBar, MdAutoStories, MdGroups] as const;
 
 /** Banda horizontal en el viewport: el ancla activa es la última cuyo top está por encima de esa línea. */
 function computeActiveSectionId(): string {
@@ -71,11 +62,11 @@ function NavDot({ active }: { active: boolean }) {
 
   return (
     <span
-      className="relative flex h-14 w-14 shrink-0 items-center justify-center md:h-16 md:w-16"
+      className="relative flex h-14 w-14 shrink-0 items-center justify-center xl:h-16 xl:w-16"
       aria-hidden
     >
       <span
-        className="pointer-events-none absolute flex h-[2.65rem] w-[2.65rem] items-center justify-center rounded-full border-[3px] border-red-600 bg-transparent md:h-12 md:w-12 md:border-[3.5px]"
+        className="pointer-events-none absolute flex h-[2.65rem] w-[2.65rem] items-center justify-center rounded-full border-[3px] border-red-600 bg-transparent xl:h-12 xl:w-12 xl:border-[3.5px]"
         style={{
           transform: active ? "scale(1)" : "scale(0.2)",
           opacity: active ? 1 : 0,
@@ -84,9 +75,7 @@ function NavDot({ active }: { active: boolean }) {
       />
       <span
         className={`relative z-[1] shrink-0 rounded-full bg-blue-900 ${
-          active
-            ? "h-3.5 w-3.5 md:h-4 md:w-4"
-            : "h-4 w-4 md:h-5 md:w-5"
+          active ? "h-3.5 w-3.5 xl:h-4 xl:w-4" : "h-4 w-4 xl:h-5 xl:w-5"
         }`}
         style={{
           transform: active ? "scale(1)" : "scale(0.92)",
@@ -163,7 +152,7 @@ function MobileBottomNav({ activeId, homeActive, goHomeTop }: MobileNavProps) {
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed inset-x-0 bottom-0 z-[95] border-t border-white/15 bg-brand-bg/94 px-1 pt-1 shadow-[0_-8px_24px_rgb(0_0_0/0.2)] backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-[95] border-t border-white/15 bg-brand-bg/94 px-1 pt-1 shadow-[0_-8px_24px_rgb(0_0_0/0.2)] backdrop-blur-md xl:hidden"
       style={{
         paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))",
       }}
@@ -212,7 +201,7 @@ function RootLayout() {
     if (!nav) return;
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 768px)", () => {
+      mm.add("(min-width: 1280px)", () => {
         const items = gsap.utils.toArray<HTMLElement>(
           "[data-desktop-nav-item]",
           nav,
@@ -250,7 +239,7 @@ function RootLayout() {
   const homeActive = activeId === "inicio-republica";
 
   const rowClass =
-    "flex items-center gap-5 py-1.5 text-left outline-none md:gap-6 md:py-2 focus-visible:ring-2 focus-visible:ring-blue-900/35 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent";
+    "flex items-center gap-5 py-1.5 text-left outline-none xl:gap-6 xl:py-2 focus-visible:ring-2 focus-visible:ring-blue-900/35 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent";
 
   return (
     <>
@@ -259,9 +248,9 @@ function RootLayout() {
       <nav
         ref={desktopNavRef}
         aria-label="Secciones de la página"
-        className="group/nav pointer-events-none fixed left-14 top-1/2 z-[95] hidden -translate-y-1/2 md:flex md:flex-col md:left-20 lg:left-24"
+        className="group/nav pointer-events-none fixed left-14 top-1/2 z-[95] hidden -translate-y-1/2 xl:flex xl:flex-col xl:left-20 2xl:left-24"
       >
-        <div className="pointer-events-auto flex flex-col gap-8 md:gap-10">
+        <div className="pointer-events-auto flex flex-col gap-8 xl:gap-10">
           <button
             type="button"
             data-desktop-nav-item
@@ -271,7 +260,7 @@ function RootLayout() {
           >
             <NavDot active={homeActive} />
             <span
-              className={`${labelTextClass(homeActive)} font-heading text-sm tracking-[0.1em] md:text-base`}
+              className={`${labelTextClass(homeActive)} font-heading text-sm tracking-[0.1em] xl:text-base`}
             >
               República
             </span>
@@ -280,15 +269,10 @@ function RootLayout() {
           {SECTION_LINKS.map(({ id, label, to }) => {
             const isActive = activeId === id;
             return (
-              <Link
-                key={id}
-                data-desktop-nav-item
-                to={to}
-                className={rowClass}
-              >
+              <Link key={id} data-desktop-nav-item to={to} className={rowClass}>
                 <NavDot active={isActive} />
                 <span
-                  className={`${labelTextClass(isActive)} font-body text-xs md:text-[0.8125rem]`}
+                  className={`${labelTextClass(isActive)} font-body text-xs xl:text-[0.8125rem]`}
                 >
                   {label}
                 </span>
@@ -298,7 +282,7 @@ function RootLayout() {
         </div>
       </nav>
 
-      <div className="pb-[calc(5.35rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+      <div className="pb-[calc(5.35rem+env(safe-area-inset-bottom,0px))] xl:pb-0">
         <Outlet />
         <footer className="border-t border-white/5 bg-brand-bg px-6 py-8 text-center font-body text-xs text-brand-muted">
           © {new Date().getFullYear()} web consepto

@@ -491,3 +491,32 @@ body {
     animation: none;
   }
 }
+
+.experiencia-sensorial-section .sensorial-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  background: linear-gradient(
+    125deg,
+    transparent 36%,
+    rgb(255 255 255 / 0.06) 48%,
+    transparent 58%
+  );
+  pointer-events: none;
+}
+
+.experiencia-sensorial-section .sensorial-card:hover::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ritual-card {
+    transition: none !important;
+  }
+
+  .ritual-card:hover {
+    transform: none !important;
+  }
+}
