@@ -55,10 +55,10 @@ export default function ValorSlider() {
   const autoplay = prefersReducedMotion
     ? false
     : {
-          delay: 5500,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: false,
-        };
+        delay: 5500,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: false,
+      };
 
   return (
     <div className="valor-swiper mx-auto max-w-3xl px-4" data-reveal>
