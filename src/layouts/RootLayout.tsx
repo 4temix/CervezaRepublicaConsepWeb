@@ -286,6 +286,7 @@ function RootLayout() {
         <Outlet />
         <footer className="border-t border-white/5 bg-brand-bg px-6 py-8 text-center font-body text-xs text-brand-muted">
           © {new Date().getFullYear()} web consepto
+          <div>yasel2k21@gmail.com</div>
         </footer>
       </div>
 
