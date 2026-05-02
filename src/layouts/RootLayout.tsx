@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { MdAutoStories, MdGroups, MdHome, MdLocalBar } from "react-icons/md";
 import gsap from "gsap";
-import MousePointer from "../Components/MousePointer";
+import MousePointer from "../components/MousePointer";
 
 /** IDs de sección en HomePage (hero = inicio) */
 const SECTION_IDS = [
