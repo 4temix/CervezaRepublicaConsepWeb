@@ -18,6 +18,10 @@ const router = createBrowserRouter(
       element: <NotFoundPage />,
     },
     {
+      path: "*",
+      element: <NotFoundPage />,
+    },
+    {
       element: <RootLayout />,
       children: [
         {

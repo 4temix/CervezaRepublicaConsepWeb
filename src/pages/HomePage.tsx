@@ -4,9 +4,9 @@ import "../App.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { homeImages } from "../assets/homeImages";
-import BrandAccentLines from "../Components/BrandAccentLines";
-import ExperienciaRepublica from "../Components/ExperienciaRepublica";
-import ValorSlider from "../Components/ValorSlider";
+import BrandAccentLines from "../components/BrandAccentLines";
+import ValorSlider from "../components/ValorSlider";
+import ExperienciaRepublica from "../components/ExperienciaRepublica";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -640,6 +640,7 @@ function HomePage() {
     if (reduced || !finePointer) return;
 
     const maxDeg = 5.5;
+
     const onMove = (e: MouseEvent) => {
       const r = el.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width;
@@ -888,7 +889,10 @@ function HomePage() {
                 </div>
               </div>
 
-              <div className="beer-showcase-frame mx-auto w-full max-w-[520px]" data-reveal>
+              <div
+                className="beer-showcase-frame mx-auto w-full max-w-[520px]"
+                data-reveal
+              >
                 <div
                   ref={beerShowcaseInnerRef}
                   className="beer-showcase-inner relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden p-8 md:p-12"
